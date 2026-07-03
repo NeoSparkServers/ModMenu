@@ -1,0 +1,17 @@
+{
+  "$schema": "https://content.luanti.org/api/cdb_schema/",
+  "type": "MOD",
+  "name": "mod_menu",
+  "title": "Mod Menu for Luanti",
+  "short_description": "In-game menu for loaded Luanti mods and registered settings screens.",
+  "dev_state": "BETA",
+  "ai_disclosure": "ASSISTED",
+  "tags": [
+    "gui",
+    "developer_tools",
+    "server_tools"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "media_license": "CC-BY-4.0",
+  "long_description": "A regular Lua mod that adds `/modmenu`: a fullscreen in-game catalog for loaded Luanti mods.\n\nFeatures:\n\n- View loaded mods with search, sort, library filtering, badges, icons, and metadata from `mod.conf`.\n- Open schema-based settings screens registered by other mods through `mod_menu.register_settings`.\n- Use tabs, collapsible sections, Reset, Reset All, boolean buttons, enum dropdowns, fields, and numeric slider-style controls.\n- Admins with the `server` privilege can control whether regular players can open Mod Menu and can disable settings screens per mod.\n\nCompatibility target: Luanti 5.10+, Mineclonia, and VoxeLibre (`mineclone2`). The mod is still usable in other games.\n\nLimitations:\n\n- Stock Luanti Lua mods cannot add a stable button to the engine ESC/pause menu, so this port uses `/modmenu`.\n- This is an unofficial Luanti port inspired by TerraformersMC Mod Menu and is not affiliated with or endorsed by TerraformersMC."
+}

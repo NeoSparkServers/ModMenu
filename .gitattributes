@@ -1,0 +1,11 @@
+/screenshots/ export-ignore
+/icon/ export-ignore
+/RELEASE_NOTES.md export-ignore
+/PUBLISH_CHECKLIST.md export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
+*.zip export-ignore
+*.7z export-ignore
+*.rar export-ignore
+*.log export-ignore
+*.tmp export-ignore

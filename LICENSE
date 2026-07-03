@@ -1,0 +1,41 @@
+# License
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+
+## Code
+
+The Lua source code and project documentation for Mod Menu for Luanti are
+licensed under the GNU Lesser General Public License, version 3.0 or, at your
+option, any later version: `LGPL-3.0-or-later`.
+
+Full license text:
+
+- https://www.gnu.org/licenses/lgpl-3.0.html
+- https://www.gnu.org/licenses/gpl-3.0.html
+
+## Media
+
+Project-owned media files are licensed under Creative Commons Attribution 4.0
+International: `CC-BY-4.0`.
+
+This includes:
+
+- `textures/mod_menu_no_image.png`
+- `icon/MMI.png`, created manually by the project maintainer
+- `screenshots/*.png`, captured by the project maintainer
+
+The `icon/` and `screenshots/` folders are page assets and are excluded from
+Git-based ContentDB release archives by `.gitattributes`.
+
+## Third-Party Notices
+
+This is an unofficial Luanti port inspired by TerraformersMC Mod Menu. It is
+not affiliated with or endorsed by TerraformersMC.
+
+Original Mod Menu source is MIT licensed. See `THIRD_PARTY.md` and `NOTICE.md`
+for attribution and the preserved MIT license notice.
+
+## AI Disclosure
+
+Development of this Luanti port was assisted by OpenAI Codex. The project icon
+was created manually by the project maintainer.
