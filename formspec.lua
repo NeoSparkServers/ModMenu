@@ -253,6 +253,7 @@ function mod_menu.build_formspec(player_name)
 	local table_content, table_columns = build_mod_table(rows, state)
 	local detail_y = layout.content_y + 1.3
 	local detail_h = layout.content_h - 2.3
+	local visible_detail = detail_text(selected_mod, false)
 	local all_mods = mod_menu.get_all_mods()
 	local compatible_count = count_compatible_mods(all_mods)
 
@@ -282,7 +283,8 @@ function mod_menu.build_formspec(player_name)
 		"box[", layout.right_x, ",", layout.content_y, ";", layout.right_w, ",", layout.content_h, ";#1d2431]",
 		selected_mod and selected_mod.icon and ("image[" .. layout.right_x + 0.3 .. "," .. layout.content_y + 0.25 .. ";0.75,0.75;" .. esc(selected_mod.icon) .. "]") or "",
 		"label[", layout.right_x + (selected_mod and selected_mod.icon and 1.15 or 0.3), ",", layout.content_y + 0.45, ";", esc(selected_mod and display_name(selected_mod) or S("No mod selected")), "]",
-		"textarea[", layout.right_x + 0.3, ",", detail_y, ";", layout.right_w - 0.6, ",", detail_h, ";details;;", esc(detail_text(selected_mod, false)), "]",
+		"box[", layout.right_x + 0.3, ",", detail_y, ";", layout.right_w - 0.6, ",", detail_h, ";#1E1E1EFF]",
+		"textarea[", layout.right_x + 0.42, ",", detail_y + 0.12, ";", layout.right_w - 0.84, ",", detail_h - 0.24, ";;;", esc(visible_detail), "]",
 		config_enabled and ("button[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.05 .. ";2.3,0.6;configure;" .. esc(S("Settings")) .. "]") or "",
 		selected_mod and config_registered and not config_enabled and ("label[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.25 .. ";" .. esc(S("Settings disabled by admin")) .. "]") or "",
 		selected_mod and not config_registered and ("label[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.25 .. ";" .. esc(S("No settings screen")) .. "]") or "",
