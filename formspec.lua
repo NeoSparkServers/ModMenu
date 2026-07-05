@@ -268,7 +268,7 @@ function mod_menu.build_formspec(player_name)
 	local visible_detail = detail_override or generated_detail
 	local editing_detail = selected_mod and state.detail_edit_id == selected_mod.id
 	local edit_text = editing_detail and (state.detail_draft or visible_detail) or ""
-	local detail_box_color = "#1E1E1EFF"
+	local detail_box_color = editing_detail and "#1E1E1EFF" or "#1d2431FF"
 	local button_y = layout.footer_y + 0.05
 	local close_x = layout.width - layout.margin - 1.45
 	local cancel_x = close_x - 1.6 - 0.25
