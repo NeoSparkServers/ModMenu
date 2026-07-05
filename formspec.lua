@@ -50,10 +50,10 @@ end
 local BUTTON_BG = "#b8bec8"
 local BUTTON_BG_HOVER = "#d6dae1"
 local BUTTON_TEXT = "#111827"
-local SEARCH_TEXT = "#1d4ed8"
-local RESET_TEXT = "#b91c1c"
-local YES_TEXT = "#15803d"
-local NO_TEXT = "#b91c1c"
+local SEARCH_TEXT = "#4774F5"
+local RESET_TEXT = "#EC2222"
+local YES_TEXT = "#27EC71"
+local NO_TEXT = "#EC2222"
 
 local function button_style_type()
 	return "style_type[button,button_exit;border=true;bgcolor=" .. BUTTON_BG ..
