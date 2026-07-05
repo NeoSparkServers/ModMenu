@@ -73,6 +73,8 @@ show paths for diagnostics.
 - Details panel populated from `mod.conf`, including name, title, description,
   author, license, dependencies, optional dependencies, and Mod Menu support.
 - Schema-based settings screens for compatible mods.
+- Mod Menu registers its own settings screen, so it appears as a compatible mod
+  and doubles as a small built-in API example.
 - Tabs, collapsible sections, Reset, Reset All, bool buttons, enum dropdowns,
   string fields, numeric fields, and slider-style controls.
 - Admin controls for allowing or blocking regular player access and disabling
@@ -82,6 +84,9 @@ show paths for diagnostics.
 
 Compatible mods can expose settings without writing formspecs or parsing raw
 fields. A flat `settings` list is displayed as a single `General` tab:
+
+Mod Menu itself uses this same API for its own small settings screen. That makes
+the built-in entry a practical reference for other mods.
 
 ```lua
 mod_menu.register_settings("example_mod", {

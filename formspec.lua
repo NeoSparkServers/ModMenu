@@ -942,6 +942,10 @@ function mod_menu.handle_fields(player, formname, fields)
 			state.detail_draft = mod_menu.clean_detail_text(fields.detail_edit_text)
 		end
 
+		if fields.quit and mod_menu.cancel_detail_edit_on_close() then
+			clear_detail_edit_state(state)
+		end
+
 		if fields.configure and state.selected_id then
 			mod_menu.open_settings(player_name, state.selected_id)
 			return true

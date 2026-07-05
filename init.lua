@@ -35,6 +35,21 @@ end
 dofile(modpath .. "/config.lua")
 dofile(modpath .. "/metadata.lua")
 dofile(modpath .. "/api.lua")
+
+mod_menu.register_settings(modname, {
+	title = mod_menu.S("Mod Menu"),
+	icon = "mod_menu_icon.png",
+	settings = {
+		{
+			key = mod_menu.CANCEL_DETAIL_EDIT_ON_CLOSE_KEY,
+			type = "bool",
+			label = mod_menu.S("Cancel text edit on close"),
+			description = mod_menu.S("Discard unsaved custom detail text edits when the main Mod Menu window is closed."),
+			default = true,
+		},
+	},
+})
+
 dofile(modpath .. "/formspec.lua")
 
 core.register_chatcommand("modmenu", {
