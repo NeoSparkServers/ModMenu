@@ -937,6 +937,11 @@ function mod_menu.handle_fields(player, formname, fields)
 		if handle_settings_scroll_drag(player_name, mod_id, fields) then
 			return true
 		end
+		-- Live horizontal slider drag also has to bypass delayed redraws; otherwise
+		-- the client can lose mouse capture and the thumb appears to freeze.
+		if mod_menu.handle_settings_slider_drag and mod_menu.handle_settings_slider_drag(player_name, mod_id, fields) then
+			return true
+		end
 		if fields.quit then
 			mod_menu.reset_settings_form_state(player_name, mod_id)
 			return true

@@ -486,7 +486,6 @@ end
 
 local function live_scrollbar_change(fields, definition)
 	local saw_scrollbar = false
-	local saw_setting_slider = false
 	local slider_names = {}
 
 	for _, item in ipairs(definition.saveable) do
@@ -499,16 +498,53 @@ local function live_scrollbar_change(fields, definition)
 		if slider_names[name] then
 			local event = scrollbar_event(raw)
 			if not event or event.type ~= "CHG" then
-				return false, false
+				return false
 			end
 			saw_scrollbar = true
-			saw_setting_slider = saw_setting_slider or slider_names[name] == true
 		else
-			return false, false
+			return false
 		end
 	end
 
-	return saw_scrollbar, saw_setting_slider
+	return saw_scrollbar
+end
+
+function mod_menu.handle_settings_slider_drag(player_name, mod_id, fields)
+	local definition = mod_menu.registered_settings[mod_id]
+	if not definition or not fields then
+		return false
+	end
+
+	local state = mod_menu.get_settings_form_state(player_name, mod_id)
+	if not state then
+		return false
+	end
+
+	local slider_items = {}
+	for _, item in ipairs(definition.saveable) do
+		if item.type ~= "list" and (item.type == "number" or item.type == "int") and item.min ~= nil and item.max ~= nil then
+			slider_items[slider_name(item)] = item
+		end
+	end
+
+	local handled = false
+	for name, raw in pairs(fields) do
+		local item = slider_items[name]
+		if item then
+			local event = scrollbar_event(raw)
+			if not event or event.type ~= "CHG" then
+				return false
+			end
+
+			local value = slider_to_value(item, raw)
+			if value ~= nil then
+				state.values[item.key] = value
+				handled = true
+			end
+		end
+	end
+
+	return handled
 end
 
 function mod_menu.update_settings_draft_from_fields(player_name, mod_id, fields)
@@ -523,7 +559,7 @@ function mod_menu.update_settings_draft_from_fields(player_name, mod_id, fields)
 	end
 
 	local clamped = false
-	local live_scrollbar, live_setting_slider = live_scrollbar_change(fields, definition)
+	local live_scrollbar = live_scrollbar_change(fields, definition)
 
 	if fields.mm_search ~= nil then
 		if state.search ~= fields.mm_search then
@@ -630,7 +666,7 @@ function mod_menu.update_settings_draft_from_fields(player_name, mod_id, fields)
 		reset_all_values(state, definition)
 	end
 
-	return clamped, not live_scrollbar, live_setting_slider
+	return clamped, not live_scrollbar, false
 end
 
 function mod_menu.save_settings(player_name, mod_id, fields)
