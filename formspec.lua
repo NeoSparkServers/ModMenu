@@ -158,6 +158,11 @@ local function selected_mod_from_state(rows, state)
 	return mod, selected_index
 end
 
+local function clear_detail_edit_state(state)
+	state.detail_edit_id = nil
+	state.detail_draft = nil
+end
+
 local function build_mod_table(rows, state)
 	local values = {}
 	local image_indexes = {}
@@ -217,7 +222,7 @@ local function get_layout(player_name)
 	local top = 0.3
 	local search_y = 1.25
 	local content_y = 2.1
-	local footer_h = 0.75
+	local footer_h = 0.85
 	local content_h = height - content_y - footer_h - 0.25
 	local left_w = math.max(7.2, (width - margin * 2 - gap) * 0.48)
 	local right_x = margin + left_w + gap
@@ -252,10 +257,23 @@ function mod_menu.build_formspec(player_name)
 	local layout = get_layout(player_name)
 	local table_content, table_columns = build_mod_table(rows, state)
 	local detail_y = layout.content_y + 1.3
-	local detail_h = layout.content_h - 2.3
-	local visible_detail = detail_text(selected_mod, false)
+	local detail_h = layout.content_h - 1.6
 	local all_mods = mod_menu.get_all_mods()
 	local compatible_count = count_compatible_mods(all_mods)
+	if state.detail_edit_id and (not selected_mod or state.detail_edit_id ~= selected_mod.id) then
+		clear_detail_edit_state(state)
+	end
+	local generated_detail = detail_text(selected_mod, false)
+	local detail_override = selected_mod and mod_menu.get_detail_override(selected_mod.id) or nil
+	local visible_detail = detail_override or generated_detail
+	local editing_detail = selected_mod and state.detail_edit_id == selected_mod.id
+	local edit_text = editing_detail and (state.detail_draft or visible_detail) or ""
+	local detail_box_color = "#1E1E1EFF"
+	local button_y = layout.footer_y + 0.05
+	local close_x = layout.width - layout.margin - 1.45
+	local cancel_x = close_x - 1.6 - 0.25
+	local edit_x = layout.right_x + 0.3
+	local settings_x = edit_x + 1.5
 
 	return table.concat({
 		"formspec_version[6]",
@@ -270,6 +288,7 @@ function mod_menu.build_formspec(player_name)
 		button_text_style("apply_search", SEARCH_TEXT),
 		"style_type[field;textcolor=#edf2ff;bgcolor=#222938]",
 		"style_type[table;textcolor=#edf2ff]",
+		"style[detail_edit_text;border=false;textcolor=#edf2ff]",
 		"box[", layout.margin, ",", layout.top, ";", layout.width - layout.margin * 2, ",0.75;#222938]",
 		"label[", layout.margin + 0.25, ",", layout.top + 0.33, ";", esc(S("Mod Menu")), "]",
 		"button[", layout.width - layout.margin - 1.35, ",", layout.top + 0.1, ";1.35,0.55;refresh;", esc(S("Refresh")), "]",
@@ -283,12 +302,19 @@ function mod_menu.build_formspec(player_name)
 		"box[", layout.right_x, ",", layout.content_y, ";", layout.right_w, ",", layout.content_h, ";#1d2431]",
 		selected_mod and selected_mod.icon and ("image[" .. layout.right_x + 0.3 .. "," .. layout.content_y + 0.25 .. ";0.75,0.75;" .. esc(selected_mod.icon) .. "]") or "",
 		"label[", layout.right_x + (selected_mod and selected_mod.icon and 1.15 or 0.3), ",", layout.content_y + 0.45, ";", esc(selected_mod and display_name(selected_mod) or S("No mod selected")), "]",
-		"box[", layout.right_x + 0.3, ",", detail_y, ";", layout.right_w - 0.6, ",", detail_h, ";#1E1E1EFF]",
-		"textarea[", layout.right_x + 0.42, ",", detail_y + 0.12, ";", layout.right_w - 0.84, ",", detail_h - 0.24, ";;;", esc(visible_detail), "]",
-		config_enabled and ("button[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.05 .. ";2.3,0.6;configure;" .. esc(S("Settings")) .. "]") or "",
-		selected_mod and config_registered and not config_enabled and ("label[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.25 .. ";" .. esc(S("Settings disabled by admin")) .. "]") or "",
-		selected_mod and not config_registered and ("label[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.25 .. ";" .. esc(S("No settings screen")) .. "]") or "",
-		"button_exit[", layout.width - layout.margin - 1.45, ",", layout.footer_y + 0.05, ";1.45,0.6;close;", esc(S("Close")), "]",
+		"box[", layout.right_x + 0.3, ",", detail_y, ";", layout.right_w - 0.6, ",", detail_h, ";", detail_box_color, "]",
+		editing_detail and ("textarea[" .. layout.right_x + 0.42 .. "," .. (detail_y + 0.12) .. ";" ..
+			(layout.right_w - 0.84) .. "," .. (detail_h - 0.24) .. ";detail_edit_text;;" .. esc(edit_text) .. "]") or
+			("textarea[" .. layout.right_x + 0.42 .. "," .. (detail_y + 0.12) .. ";" ..
+				(layout.right_w - 0.84) .. "," .. (detail_h - 0.24) .. ";;;" .. esc(visible_detail) .. "]"),
+		config_enabled and ("button[" .. settings_x .. "," .. button_y .. ";2.3,0.6;configure;" .. esc(S("Settings")) .. "]") or "",
+		selected_mod and config_registered and not config_enabled and ("label[" .. settings_x .. "," .. (button_y + 0.2) .. ";" .. esc(S("Settings disabled by admin")) .. "]") or "",
+		selected_mod and not config_registered and ("label[" .. settings_x .. "," .. (button_y + 0.2) .. ";" .. esc(S("No settings screen")) .. "]") or "",
+		selected_mod and (editing_detail and
+			("button[" .. edit_x .. "," .. button_y .. ";1.35,0.6;detail_edit_save;" .. esc(S("Save")) .. "]") or
+			("button[" .. edit_x .. "," .. button_y .. ";1.35,0.6;detail_edit_start;" .. esc(S("Edit")) .. "]")) or "",
+		editing_detail and ("button[" .. cancel_x .. "," .. button_y .. ";1.6,0.6;detail_edit_cancel;" .. esc(S("Cancel")) .. "]") or "",
+		"button_exit[", close_x, ",", button_y, ";1.45,0.6;close;", esc(S("Close")), "]",
 	})
 end
 
@@ -804,13 +830,17 @@ end
 
 local function handle_table_event(state, fields)
 	if not fields.mod_list or not core.explode_table_event then
-		return
+		return false
 	end
 
 	local event = core.explode_table_event(fields.mod_list)
 	if (event.type == "CHG" or event.type == "DCL") and event.row > 0 and state.row_map and state.row_map[event.row] then
+		local previous_id = state.selected_id
 		state.selected_id = state.row_map[event.row]
+		return previous_id ~= state.selected_id
 	end
+
+	return false
 end
 
 local function handle_admin_table_event(state, fields)
@@ -892,7 +922,25 @@ function mod_menu.handle_fields(player, formname, fields)
 			mod_menu.reset_cache()
 		end
 
-		handle_table_event(state, fields)
+		if handle_table_event(state, fields) then
+			clear_detail_edit_state(state)
+		end
+
+		if fields.detail_edit_cancel then
+			clear_detail_edit_state(state)
+		elseif fields.detail_edit_save and state.detail_edit_id then
+			if fields.detail_edit_text ~= nil then
+				state.detail_draft = mod_menu.clean_detail_text(fields.detail_edit_text)
+			end
+			mod_menu.set_detail_override(state.detail_edit_id, state.detail_draft or "")
+			clear_detail_edit_state(state)
+		elseif fields.detail_edit_start and state.selected_id then
+			local selected_mod = mod_menu.find_mod(state.selected_id)
+			state.detail_edit_id = state.selected_id
+			state.detail_draft = mod_menu.get_detail_override(state.selected_id) or detail_text(selected_mod, false)
+		elseif fields.detail_edit_text ~= nil and state.detail_edit_id then
+			state.detail_draft = mod_menu.clean_detail_text(fields.detail_edit_text)
+		end
 
 		if fields.configure and state.selected_id then
 			mod_menu.open_settings(player_name, state.selected_id)

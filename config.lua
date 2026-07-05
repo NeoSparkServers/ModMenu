@@ -42,6 +42,10 @@ local function storage_key(name)
 	return "config_enabled:" .. name
 end
 
+local function detail_override_key(mod_id)
+	return "detail_override:" .. tostring(mod_id or "")
+end
+
 function mod_menu.get_storage_bool(key, default)
 	local value = mod_menu.storage:get_string(key)
 	if value == "" then
@@ -81,6 +85,30 @@ end
 
 function mod_menu.has_enabled_config(mod_id)
 	return mod_menu.has_settings(mod_id) and mod_menu.is_config_enabled(mod_id)
+end
+
+function mod_menu.clean_detail_text(value)
+	value = tostring(value or ""):gsub("\r\n", "\n"):gsub("\r", "\n")
+	value = value:gsub("<br%s*/%s*>", "\n"):gsub("<br%s*>", "\n")
+	value = value:gsub("<global[^>]*>", ""):gsub("</global>", "")
+	return value
+end
+
+function mod_menu.get_detail_override(mod_id)
+	local value = mod_menu.storage:get_string(detail_override_key(mod_id))
+	if value == "" then
+		return nil
+	end
+	return mod_menu.clean_detail_text(value)
+end
+
+function mod_menu.set_detail_override(mod_id, value)
+	value = mod_menu.clean_detail_text(value)
+	if value:match("%S") then
+		mod_menu.storage:set_string(detail_override_key(mod_id), value)
+	else
+		mod_menu.storage:set_string(detail_override_key(mod_id), "")
+	end
 end
 
 function mod_menu.chat(player_name, message)
