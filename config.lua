@@ -44,6 +44,10 @@ local function storage_key(name)
 	return "config_enabled:" .. name
 end
 
+local function setting_enabled_key(mod_id, setting_key)
+	return "setting_enabled:" .. tostring(mod_id or "") .. ":" .. tostring(setting_key or "")
+end
+
 local function detail_override_key(mod_id)
 	return "detail_override:" .. tostring(mod_id or "")
 end
@@ -95,6 +99,20 @@ end
 
 function mod_menu.has_enabled_config(mod_id)
 	return mod_menu.has_settings(mod_id) and mod_menu.is_config_enabled(mod_id)
+end
+
+function mod_menu.is_setting_enabled(mod_id, setting_key)
+	return mod_menu.get_storage_bool(setting_enabled_key(mod_id, setting_key), true)
+end
+
+function mod_menu.set_setting_enabled(mod_id, setting_key, value)
+	mod_menu.set_storage_bool(setting_enabled_key(mod_id, setting_key), value)
+end
+
+function mod_menu.toggle_setting_enabled(mod_id, setting_key)
+	local enabled = not mod_menu.is_setting_enabled(mod_id, setting_key)
+	mod_menu.set_setting_enabled(mod_id, setting_key, enabled)
+	return enabled
 end
 
 function mod_menu.clean_detail_text(value)

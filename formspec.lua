@@ -411,7 +411,11 @@ local SETTINGS_BODY_PAD = 0.15
 local SETTINGS_SCROLLBAR_W = 0.34
 local SETTINGS_SCROLLBAR_GAP = 0.28
 local SETTINGS_RESET_W = 1.15
+local SETTINGS_GATE_W = 0.55
+local SETTINGS_GATE_GAP = 0.15
 local SETTINGS_CONTROL_GAP = 0.35
+local GATE_ENABLED_LABEL = string.char(226, 156, 147)
+local GATE_DISABLED_LABEL = string.char(226, 156, 149)
 local settings_saveable_types = {
 	bool = true,
 	enum = true,
@@ -480,6 +484,25 @@ local function reset_button(parts, setting, x, y)
 	end
 end
 
+local function should_show_gate(gate_context, setting)
+	return gate_context and gate_context.show and setting and settings_saveable_types[setting.type]
+end
+
+local function gate_button(parts, gate_context, setting, x, y)
+	if not should_show_gate(gate_context, setting) then
+		return
+	end
+
+	local name = "mm_gate_" .. setting.uid
+	local enabled = mod_menu.is_setting_enabled(gate_context.mod_id, setting.key)
+	local label = enabled and GATE_ENABLED_LABEL or GATE_DISABLED_LABEL
+	local color = enabled and YES_TEXT or NO_TEXT
+	parts[#parts + 1] = "style[" .. name .. ";border=true;bgcolor=" .. BUTTON_BG ..
+		";textcolor=" .. color .. ";bgcolor_hovered=" .. BUTTON_BG_HOVER .. "]"
+	parts[#parts + 1] = "button[" .. x .. "," .. y .. ";" .. SETTINGS_GATE_W .. ",0.52;" ..
+		name .. ";" .. esc(label) .. "]"
+end
+
 local function field_value(setting, value)
 	if setting.type == "number" or setting.type == "int" then
 		return number_text(value)
@@ -498,15 +521,19 @@ local function render_bool(parts, setting, value, x, y, w)
 	parts[#parts + 1] = "button[" .. x .. "," .. y .. ";" .. w .. ",0.52;" .. name .. ";" .. esc(label) .. "]"
 end
 
-local function render_setting(parts, setting, state, x, y, w, indent)
+local function render_setting(parts, setting, state, x, y, w, indent, gate_context)
 	indent = indent + (setting.indent or 0) * 0.35
 	local label_x = x + indent
 	local is_number = setting.type == "number" or setting.type == "int"
 	local has_slider = is_number and setting.min ~= nil and setting.max ~= nil and setting.ui ~= "field"
 	local reset_w = setting.resettable and SETTINGS_RESET_W or 0
 	local reset_x = x + w - reset_w
+	local show_gate = should_show_gate(gate_context, setting)
+	local gate_right_x = reset_w > 0 and reset_x - SETTINGS_GATE_GAP or x + w
+	local gate_x = gate_right_x - (show_gate and SETTINGS_GATE_W or 0)
+	local control_right_x = show_gate and gate_x or reset_x
 	local control_w = math.min(has_slider and 5.65 or 4.8, math.max(2.85, w * 0.28))
-	local control_x = reset_x - control_w - SETTINGS_CONTROL_GAP
+	local control_x = control_right_x - control_w - SETTINGS_CONTROL_GAP
 	local label_w = math.max(2.4, control_x - label_x - SETTINGS_CONTROL_GAP)
 	local value = current_value(state, setting)
 	local help = setting_help_text(setting)
@@ -557,6 +584,7 @@ local function render_setting(parts, setting, state, x, y, w, indent)
 			mod_menu._settings_field_name(setting) .. ";;" .. esc(field_value(setting, value)) .. "]"
 	end
 
+	gate_button(parts, gate_context, setting, gate_x, y + (has_slider and 0.2 or 0.03))
 	reset_button(parts, setting, reset_x, y + (has_slider and 0.2 or 0.03))
 	return y + row_h
 end
@@ -583,16 +611,22 @@ local function render_list_child(parts, list_item, child, entry, entry_index, x,
 	return y + 0.68
 end
 
-local function render_list(parts, setting, state, x, y, w, indent)
+local function render_list(parts, setting, state, x, y, w, indent, gate_context)
 	local label_x = x + indent
 	local list = current_value(state, setting)
 	if type(list) ~= "table" then
 		list = {}
 	end
 	parts[#parts + 1] = "label[" .. label_x .. "," .. (y + 0.2) .. ";" .. esc(setting.label) .. "]"
-	local reset_x = x + w - SETTINGS_RESET_W
-	parts[#parts + 1] = "button[" .. (reset_x - 1.7) .. "," .. (y + 0.03) .. ";1.55,0.52;mm_list_add_" ..
+	local reset_w = setting.resettable and SETTINGS_RESET_W or 0
+	local reset_x = x + w - reset_w
+	local show_gate = should_show_gate(gate_context, setting)
+	local gate_right_x = reset_w > 0 and reset_x - SETTINGS_GATE_GAP or x + w
+	local gate_x = gate_right_x - (show_gate and SETTINGS_GATE_W or 0)
+	local add_right_x = show_gate and gate_x - SETTINGS_CONTROL_GAP or reset_x
+	parts[#parts + 1] = "button[" .. (add_right_x - 1.55) .. "," .. (y + 0.03) .. ";1.55,0.52;mm_list_add_" ..
 		setting.uid .. ";" .. esc(S("Add Entry")) .. "]"
+	gate_button(parts, gate_context, setting, gate_x, y + 0.03)
 	reset_button(parts, setting, reset_x, y + 0.03)
 	y = y + 0.72
 	for entry_index, entry in ipairs(list) do
@@ -611,7 +645,7 @@ end
 
 local render_settings_items
 
-local function render_section(parts, section, state, x, y, w, query, indent)
+local function render_section(parts, section, state, x, y, w, query, indent, gate_context)
 	local label_x = x + indent
 	local is_open = query ~= "" or state.open_sections[section.uid]
 	local prefix = is_open and "- " or "+ "
@@ -632,20 +666,20 @@ local function render_section(parts, section, state, x, y, w, query, indent)
 		y = y + 0.68
 	end
 	if is_open then
-		y = render_settings_items(parts, section.children, state, x, y, w, query, indent + 0.38)
+		y = render_settings_items(parts, section.children, state, x, y, w, query, indent + 0.38, gate_context)
 	end
 	return y + 0.08
 end
 
-render_settings_items = function(parts, items, state, x, y, w, query, indent)
+render_settings_items = function(parts, items, state, x, y, w, query, indent, gate_context)
 	for _, item in ipairs(items or {}) do
 		if item_matches(item, query) then
 			if item.type == "section" then
-				y = render_section(parts, item, state, x, y, w, query, indent)
+				y = render_section(parts, item, state, x, y, w, query, indent, gate_context)
 			elseif item.type == "list" then
-				y = render_list(parts, item, state, x, y, w, indent)
+				y = render_list(parts, item, state, x, y, w, indent, gate_context)
 			else
-				y = render_setting(parts, item, state, x, y, w, indent)
+				y = render_setting(parts, item, state, x, y, w, indent, gate_context)
 			end
 		end
 	end
@@ -694,8 +728,12 @@ function mod_menu.build_settings_formspec(player_name, mod_id)
 	local query = tostring(state.search or ""):lower()
 	local content_parts = {}
 	local content_y = 0.12
+	local gate_context = {
+		show = mod_id ~= mod_menu.modname and mod_menu.can_admin(player_name),
+		mod_id = mod_id,
+	}
 
-	content_y = render_settings_items(content_parts, tab.settings, state, 0, content_y, scroll_w, query, 0)
+	content_y = render_settings_items(content_parts, tab.settings, state, 0, content_y, scroll_w, query, 0, gate_context)
 	if content_y <= 0.22 then
 		content_parts[#content_parts + 1] = "label[0.2,0.3;" .. esc(S("No settings match search")) .. "]"
 		content_y = 0.9
@@ -989,6 +1027,9 @@ function mod_menu.handle_fields(player, formname, fields)
 
 	if formname:sub(1, #mod_menu.CONFIG_FORM_PREFIX) == mod_menu.CONFIG_FORM_PREFIX then
 		local mod_id = formname:sub(#mod_menu.CONFIG_FORM_PREFIX + 1)
+		if not mod_menu.can_open_settings(player_name, mod_id) or not mod_menu.is_config_enabled(mod_id) then
+			return true
+		end
 		if handle_settings_scroll_drag(player_name, mod_id, fields) then
 			return true
 		end

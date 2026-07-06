@@ -509,6 +509,29 @@ local function live_scrollbar_change(fields, definition)
 	return saw_scrollbar
 end
 
+local function setting_enabled_context(definition, mod_id)
+	local values = {}
+	for _, item in ipairs(definition.saveable or {}) do
+		values[item.key] = mod_menu.is_setting_enabled(mod_id, item.key)
+	end
+	return values
+end
+
+local function handle_setting_gates(player_name, mod_id, fields, definition)
+	if mod_id == mod_menu.modname or not mod_menu.can_admin(player_name) then
+		return false
+	end
+
+	local changed = false
+	for _, item in ipairs(definition.saveable or {}) do
+		if fields["mm_gate_" .. item.uid] then
+			mod_menu.toggle_setting_enabled(mod_id, item.key)
+			changed = true
+		end
+	end
+	return changed
+end
+
 function mod_menu.handle_settings_slider_drag(player_name, mod_id, fields)
 	local definition = mod_menu.registered_settings[mod_id]
 	if not definition or not fields then
@@ -560,6 +583,7 @@ function mod_menu.update_settings_draft_from_fields(player_name, mod_id, fields)
 
 	local clamped = false
 	local live_scrollbar = live_scrollbar_change(fields, definition)
+	handle_setting_gates(player_name, mod_id, fields, definition)
 
 	if fields.mm_search ~= nil then
 		if state.search ~= fields.mm_search then
@@ -694,6 +718,7 @@ function mod_menu.save_settings(player_name, mod_id, fields)
 			mod_id = mod_id,
 			write_ok = write_ok,
 			clamped = clamped,
+			setting_enabled = setting_enabled_context(definition, mod_id),
 		})
 		if not ok then
 			save_ok = false
