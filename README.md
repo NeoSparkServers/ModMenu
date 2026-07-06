@@ -226,10 +226,11 @@ Mod Menu handles search, tabs, collapsible sections, Reset buttons, bool
 buttons, enum dropdowns, numeric clamping, `core.settings` storage,
 `core.settings:write()`, and save status messages.
 
-Admins with `modmenu_admin` can toggle individual setting gates in compatible
-mods. Gates are server-wide flags stored by Mod Menu and are enabled by default.
-They do not edit another mod's code automatically; compatible mods should query
-them before running gated behavior:
+Mod Menu exposes experimental per-setting gates for compatible mods. Gates are
+server-wide flags stored by Mod Menu and are enabled by default. The in-game
+admin buttons for editing them are currently disabled until the workflow is
+ready, but compatible mods can still query the API before running gated
+behavior:
 
 ```lua
 if mod_menu.is_setting_enabled("example_mod", "example_mod.enabled") then
@@ -290,8 +291,7 @@ The admin menu can:
 
 - allow or block regular players from opening `/modmenu`;
 - enable or disable registered settings screens per mod.
-- toggle individual settings/functions for compatible mods through the settings
-  screen gate buttons.
+- manage server-wide Mod Menu behavior and privacy options.
 
 Mod Menu's own settings screen requires `modmenu_admin`. It contains privacy and
 server-wide behavior options, including optional filesystem path display.
@@ -307,8 +307,8 @@ Recommended checks before publishing:
 - `/modmenu` opens and lists loaded mods.
 - Search, sort, library filtering, and unsupported-mod separation work.
 - Compatible mods show a Settings button.
-- Players with `modmenu_admin` see per-setting gate buttons in compatible mods
-  except Mod Menu's own settings screen.
+- Experimental per-setting gate buttons remain hidden until that UI is enabled
+  in a future update.
 - Settings screens support Save & Exit, Cancel, Reset, Reset All, bool
   buttons, dropdowns, numeric sliders, search, tabs, sections, and vertical
   scrollbar dragging.

@@ -14,6 +14,7 @@ mod_menu.storage = mod_menu.storage or core.get_mod_storage()
 mod_menu.NO_IMAGE_TEXTURE = "mod_menu_no_image.png"
 mod_menu.CANCEL_DETAIL_EDIT_ON_CLOSE_KEY = "mod_menu.cancel_detail_edit_on_close"
 mod_menu.SHOW_MOD_PATHS_KEY = "mod_menu.show_mod_paths"
+mod_menu.SETTING_GATES_UI_ENABLED = false
 
 mod_menu.defaults = {
 	sort = "asc",

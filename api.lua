@@ -518,7 +518,7 @@ local function setting_enabled_context(definition, mod_id)
 end
 
 local function handle_setting_gates(player_name, mod_id, fields, definition)
-	if mod_id == mod_menu.modname or not mod_menu.can_admin(player_name) then
+	if not mod_menu.SETTING_GATES_UI_ENABLED or mod_id == mod_menu.modname or not mod_menu.can_admin(player_name) then
 		return false
 	end
 

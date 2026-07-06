@@ -729,7 +729,7 @@ function mod_menu.build_settings_formspec(player_name, mod_id)
 	local content_parts = {}
 	local content_y = 0.12
 	local gate_context = {
-		show = mod_id ~= mod_menu.modname and mod_menu.can_admin(player_name),
+		show = mod_menu.SETTING_GATES_UI_ENABLED and mod_id ~= mod_menu.modname and mod_menu.can_admin(player_name),
 		mod_id = mod_id,
 	}
 
