@@ -718,6 +718,10 @@ function mod_menu.open_settings(player_name, mod_id)
 		mod_menu.chat(player_name, S("This mod has not registered settings."))
 		return
 	end
+	if not mod_menu.can_open_settings(player_name, mod_id) then
+		mod_menu.chat(player_name, S("Settings for @1 require the modmenu_admin privilege.", mod_id))
+		return
+	end
 	if not mod_menu.is_config_enabled(mod_id) then
 		mod_menu.chat(player_name, S("Settings are disabled for @1.", mod_id))
 		return

@@ -52,6 +52,13 @@ mod_menu.register_settings(modname, {
 			description = mod_menu.S("Discard unsaved custom detail text edits when the main Mod Menu window is closed."),
 			default = true,
 		},
+		{
+			key = mod_menu.SHOW_MOD_PATHS_KEY,
+			type = "bool",
+			label = mod_menu.S("Show mod paths"),
+			description = mod_menu.S("Show local filesystem paths in Mod Menu details. This can expose private server information."),
+			default = false,
+		},
 	},
 })
 

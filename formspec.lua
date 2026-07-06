@@ -253,7 +253,8 @@ function mod_menu.build_formspec(player_name)
 	local selected_mod, selected_index = selected_mod_from_state(rows, state)
 	local sort_label = state.sort == "desc" and "Z-A" or "A-Z"
 	local config_registered = selected_mod and mod_menu.has_settings(selected_mod.id)
-	local config_enabled = selected_mod and mod_menu.has_enabled_config(selected_mod.id)
+	local settings_allowed = selected_mod and mod_menu.can_open_settings(player_name, selected_mod.id)
+	local config_enabled = selected_mod and settings_allowed and mod_menu.has_enabled_config(selected_mod.id)
 	local layout = get_layout(player_name)
 	local table_content, table_columns = build_mod_table(rows, state)
 	local detail_y = layout.content_y + 1.3
@@ -263,7 +264,7 @@ function mod_menu.build_formspec(player_name)
 	if state.detail_edit_id and (not selected_mod or state.detail_edit_id ~= selected_mod.id) then
 		clear_detail_edit_state(state)
 	end
-	local generated_detail = detail_text(selected_mod, false)
+	local generated_detail = detail_text(selected_mod, mod_menu.show_mod_paths())
 	local detail_override = selected_mod and mod_menu.get_detail_override(selected_mod.id) or nil
 	local visible_detail = detail_override or generated_detail
 	local editing_detail = selected_mod and state.detail_edit_id == selected_mod.id
@@ -806,7 +807,7 @@ function mod_menu.build_admin_formspec(player_name)
 		"table[", layout.margin, ",", layout.content_y, ";", layout.left_w, ",", layout.content_h, ";admin_list;", table_content, ";", selected_index, "]",
 		"box[", layout.right_x, ",", layout.content_y, ";", layout.right_w, ",", layout.content_h, ";#1d2431]",
 		"label[", layout.right_x + 0.3, ",", layout.content_y + 0.35, ";", esc(selected_mod and display_name(selected_mod) or S("No configurable mods")), "]",
-		selected_mod and ("textarea[" .. layout.right_x + 0.3 .. "," .. layout.content_y + 0.85 .. ";" .. layout.right_w - 0.6 .. "," .. layout.content_h - 2.3 .. ";admin_details;;" .. esc(detail_text(selected_mod, true)) .. "]") or "",
+		selected_mod and ("textarea[" .. layout.right_x + 0.3 .. "," .. layout.content_y + 0.85 .. ";" .. layout.right_w - 0.6 .. "," .. layout.content_h - 2.3 .. ";admin_details;;" .. esc(detail_text(selected_mod, mod_menu.show_mod_paths())) .. "]") or "",
 		selected_mod and ("checkbox[" .. layout.right_x + 0.3 .. "," .. layout.footer_y - 0.65 .. ";admin_config_enabled;" .. esc(S("Allow this mod settings")) .. ";" .. (selected_enabled and "true" or "false") .. "]") or "",
 		selected_mod and ("button[" .. layout.right_x + 0.3 .. "," .. layout.footer_y + 0.05 .. ";1.45,0.6;admin_save;" .. esc(S("Save")) .. "]") or "",
 		"button[", layout.width - layout.margin - 3.05, ",", layout.footer_y + 0.05, ";1.45,0.6;admin_back;", esc(S("Back")), "]",
@@ -937,7 +938,7 @@ function mod_menu.handle_fields(player, formname, fields)
 		elseif fields.detail_edit_start and state.selected_id then
 			local selected_mod = mod_menu.find_mod(state.selected_id)
 			state.detail_edit_id = state.selected_id
-			state.detail_draft = mod_menu.get_detail_override(state.selected_id) or detail_text(selected_mod, false)
+			state.detail_draft = mod_menu.get_detail_override(state.selected_id) or detail_text(selected_mod, mod_menu.show_mod_paths())
 		elseif fields.detail_edit_text ~= nil and state.detail_edit_id then
 			state.detail_draft = mod_menu.clean_detail_text(fields.detail_edit_text)
 		end

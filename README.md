@@ -61,8 +61,9 @@ Open the admin menu:
 /modmenu admin
 ```
 
-The regular Mod Menu view hides absolute filesystem paths. The admin view can
-show paths for diagnostics.
+Mod Menu hides absolute filesystem paths by default. Players with
+`modmenu_admin` can enable path display in Mod Menu's own settings screen when
+diagnostics require it.
 
 ## Features
 
@@ -79,6 +80,8 @@ show paths for diagnostics.
   string fields, numeric fields, and slider-style controls.
 - Admin controls for allowing or blocking regular player access and disabling
   individual settings screens.
+- Optional filesystem path display, disabled by default because paths can expose
+  private server information.
 
 ## Settings API
 
@@ -266,6 +269,9 @@ The admin menu can:
 
 - allow or block regular players from opening `/modmenu`;
 - enable or disable registered settings screens per mod.
+
+Mod Menu's own settings screen requires `modmenu_admin`. It contains privacy and
+server-wide behavior options, including optional filesystem path display.
 
 These values are stored in Luanti mod storage and survive world restarts.
 

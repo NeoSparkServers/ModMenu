@@ -13,6 +13,7 @@ mod_menu.cached_mods = nil
 mod_menu.storage = mod_menu.storage or core.get_mod_storage()
 mod_menu.NO_IMAGE_TEXTURE = "mod_menu_no_image.png"
 mod_menu.CANCEL_DETAIL_EDIT_ON_CLOSE_KEY = "mod_menu.cancel_detail_edit_on_close"
+mod_menu.SHOW_MOD_PATHS_KEY = "mod_menu.show_mod_paths"
 
 mod_menu.defaults = {
 	sort = "asc",
@@ -76,6 +77,14 @@ function mod_menu.can_open(player_name)
 	return mod_menu.players_allowed() or mod_menu.can_admin(player_name)
 end
 
+function mod_menu.can_open_settings(player_name, mod_id)
+	if mod_id == mod_menu.modname and not mod_menu.can_admin(player_name) then
+		return false
+	end
+
+	return true
+end
+
 function mod_menu.is_config_enabled(mod_id)
 	return mod_menu.get_storage_bool(storage_key(mod_id), true)
 end
@@ -116,6 +125,14 @@ function mod_menu.cancel_detail_edit_on_close()
 	local value = core.settings:get(mod_menu.CANCEL_DETAIL_EDIT_ON_CLOSE_KEY)
 	if value == nil then
 		return true
+	end
+	return value == "true"
+end
+
+function mod_menu.show_mod_paths()
+	local value = core.settings:get(mod_menu.SHOW_MOD_PATHS_KEY)
+	if value == nil then
+		return false
 	end
 	return value == "true"
 end
