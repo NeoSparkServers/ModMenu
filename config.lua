@@ -69,7 +69,7 @@ function mod_menu.set_players_allowed(value)
 end
 
 function mod_menu.can_admin(player_name)
-	return core.check_player_privs(player_name, { server = true })
+	return core.check_player_privs(player_name, { modmenu_admin = true })
 end
 
 function mod_menu.can_open(player_name)

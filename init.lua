@@ -36,6 +36,11 @@ dofile(modpath .. "/config.lua")
 dofile(modpath .. "/metadata.lua")
 dofile(modpath .. "/api.lua")
 
+core.register_privilege("modmenu_admin", {
+	description = mod_menu.S("Can administer Mod Menu"),
+	give_to_singleplayer = true,
+})
+
 mod_menu.register_settings(modname, {
 	title = mod_menu.S("Mod Menu"),
 	icon = "mod_menu_icon.png",
@@ -63,7 +68,7 @@ core.register_chatcommand("modmenu", {
 		param = tostring(param or ""):match("^%s*(.-)%s*$")
 		if param == "admin" then
 			if not mod_menu.can_admin(name) then
-				return false, mod_menu.S("You need the server privilege to open Mod Menu admin.")
+				return false, mod_menu.S("You need the modmenu_admin privilege to open Mod Menu admin.")
 			end
 
 			mod_menu.show_admin(name)

@@ -62,5 +62,6 @@ Entry @1=Entry @1
 Add Entry=Add Entry
 Remove=Remove
 No settings match search=No settings match search
-You need the server privilege to open Mod Menu admin.=You need the server privilege to open Mod Menu admin.
+Can administer Mod Menu=Can administer Mod Menu
+You need the modmenu_admin privilege to open Mod Menu admin.=You need the modmenu_admin privilege to open Mod Menu admin.
 Mod Menu is currently disabled by an administrator.=Mod Menu is currently disabled by an administrator.

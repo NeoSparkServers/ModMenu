@@ -260,7 +260,7 @@ it is shown below the unsupported-mods separator.
 
 ## Admin Controls
 
-Players with the `server` privilege can open `/modmenu admin`.
+Players with the `modmenu_admin` privilege can open `/modmenu admin`.
 
 The admin menu can:
 
@@ -281,7 +281,7 @@ Recommended checks before publishing:
 - Settings screens support Save & Exit, Cancel, Reset, Reset All, bool
   buttons, dropdowns, numeric sliders, search, tabs, sections, and vertical
   scrollbar dragging.
-- `/modmenu admin` requires the `server` privilege.
+- `/modmenu admin` requires the `modmenu_admin` privilege.
 - Regular Mod Menu details do not show absolute filesystem paths.
 
 ## ContentDB Metadata

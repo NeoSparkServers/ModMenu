@@ -62,5 +62,6 @@ Entry @1=Запись @1
 Add Entry=+ Запись
 Remove=Удалить
 No settings match search=Нет настроек по этому поиску
-You need the server privilege to open Mod Menu admin.=Для открытия админки Mod Menu нужна привилегия server.
+Can administer Mod Menu=Может администрировать Mod Menu
+You need the modmenu_admin privilege to open Mod Menu admin.=Для открытия админки Mod Menu нужна привилегия modmenu_admin.
 Mod Menu is currently disabled by an administrator.=Mod Menu сейчас отключён администратором.
