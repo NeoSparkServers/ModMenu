@@ -437,6 +437,7 @@ local function clamp(value, min_value, max_value)
 end
 
 local function fit_text(text, width)
+	-- Kept for single-line labels: hard cap like before.
 	text = tostring(text or "")
 	local max_chars = math.max(10, math.floor((tonumber(width) or 1) * 8.5))
 	local count = 0
@@ -451,6 +452,44 @@ local function fit_text(text, width)
 		return table.concat(out) .. "..."
 	end
 	return text
+end
+
+local function wrap_text_lines(text, width)
+	-- Word-wrap into lines that fit `width` using the same per-char estimate
+	-- as fit_text (8.5 chars per form unit). Never returns an empty table.
+	text = tostring(text or "")
+	if text == "" then
+		return { "" }
+	end
+	local max_chars = math.max(10, math.floor((tonumber(width) or 1) * 8.5))
+	local lines = {}
+	local pos = 1
+	local total = #text
+	while pos <= total and #lines < 4 do
+		local chunk = text:sub(pos, pos + max_chars - 1)
+		if pos + max_chars - 1 < total then
+			local cut = nil
+			for i = #chunk, 1, -1 do
+				local c = chunk:sub(i, i)
+				if c == " " or c == ";" then
+					cut = i
+					break
+				end
+			end
+			if cut and cut > math.floor(max_chars * 0.4) then
+				chunk = chunk:sub(1, cut - 1)
+			end
+		end
+		lines[#lines + 1] = chunk
+		pos = pos + #chunk + 1
+		while pos <= total and text:sub(pos, pos) == " " do
+			pos = pos + 1
+		end
+	end
+	if pos <= total then
+		lines[#lines] = lines[#lines]:sub(1, math.max(1, #lines[#lines] - 3)) .. "..."
+	end
+	return lines
 end
 
 local function has_resettable_child(item)
@@ -537,11 +576,20 @@ local function render_setting(parts, setting, state, x, y, w, indent, gate_conte
 	local label_w = math.max(2.4, control_x - label_x - SETTINGS_CONTROL_GAP)
 	local value = current_value(state, setting)
 	local help = setting_help_text(setting)
-	local row_h = has_slider and (help ~= "" and 1.08 or 0.92) or (help ~= "" and 0.92 or 0.68)
+	local help_lines = {}
+	if help ~= "" then
+		help_lines = wrap_text_lines(help, label_w - 0.15)
+	end
+	local help_h = 0
+	if #help_lines > 0 then
+		help_h = 0.32 + 0.3 * (#help_lines - 1)
+	end
+	local row_h = has_slider and (0.92 + help_h) or (0.68 + help_h)
 
 	parts[#parts + 1] = "label[" .. label_x .. "," .. (y + 0.2) .. ";" .. esc(fit_text(setting.label, label_w)) .. "]"
-	if help ~= "" then
-		parts[#parts + 1] = "label[" .. (label_x + 0.15) .. "," .. (y + 0.52) .. ";" .. esc(fit_text(help, label_w - 0.15)) .. "]"
+	if #help_lines > 0 then
+		parts[#parts + 1] = "label[" .. (label_x + 0.15) .. "," .. (y + 0.52) .. ";" ..
+			esc(table.concat(help_lines, "\n")) .. "]"
 	end
 
 	if setting.type == "bool" then
