@@ -708,8 +708,10 @@ local function render_section(parts, section, state, x, y, w, query, indent, gat
 			reset_name .. ";" .. esc(S("Reset")) .. "]"
 	end
 	if section.description then
-		parts[#parts + 1] = "label[" .. (label_x + 0.15) .. "," .. (y + 0.58) .. ";" .. esc(fit_text(section.description, w - indent - 0.4)) .. "]"
-		y = y + 0.92
+		local desc_lines = wrap_text_lines(section.description, w - indent - 0.4)
+		parts[#parts + 1] = "label[" .. (label_x + 0.15) .. "," .. (y + 0.58) .. ";" ..
+			esc(table.concat(desc_lines, "\n")) .. "]"
+		y = y + 0.58 + 0.32 + 0.3 * (#desc_lines - 1) + 0.14
 	else
 		y = y + 0.68
 	end
