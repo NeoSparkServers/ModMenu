@@ -709,9 +709,13 @@ local function render_section(parts, section, state, x, y, w, query, indent, gat
 	end
 	if section.description then
 		local desc_lines = wrap_text_lines(section.description, w - indent - 0.4)
-		parts[#parts + 1] = "label[" .. (label_x + 0.15) .. "," .. (y + 0.58) .. ";" ..
+		-- Labels draw visually taller than their nominal formspec row. Keep the
+		-- description well below the 0.55-high header button, rather than merely
+		-- reserving room beneath it.
+		local description_y = y + 0.82
+		parts[#parts + 1] = "label[" .. (label_x + 0.15) .. "," .. description_y .. ";" ..
 			esc(table.concat(desc_lines, "\n")) .. "]"
-		y = y + 0.58 + 0.32 + 0.3 * (#desc_lines - 1) + 0.14
+		y = description_y + 0.32 + 0.3 * (#desc_lines - 1) + 0.14
 	else
 		y = y + 0.68
 	end
