@@ -21,7 +21,8 @@ International: `CC-BY-4.0`.
 This includes:
 
 - `textures/mod_menu_no_image.png`
-- `icon/MMI.png`, created manually by the project maintainer
+- `textures/mod_menu_icon.png` and its identical copy `icon/MMI.png`,
+  created manually by the project maintainer
 - `screenshots/*.png`, captured by the project maintainer
 
 The `icon/` and `screenshots/` folders are page assets and are excluded from

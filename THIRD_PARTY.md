@@ -40,8 +40,10 @@ SOFTWARE.
 
 - `textures/mod_menu_no_image.png`: project placeholder texture, licensed
   under CC-BY-4.0 by the Mod Menu for Luanti contributors.
-- `icon/MMI.png`: ContentDB/GitHub page icon created manually by the project
-  maintainer, licensed under CC-BY-4.0 by the project maintainer.
+- `textures/mod_menu_icon.png`: in-game mod list icon, an original creation
+  made manually by the project maintainer, licensed under CC-BY-4.0. It is a
+  byte-identical copy of `icon/MMI.png` (the ContentDB/GitHub page icon), not
+  an asset from the upstream Minecraft Mod Menu or any third party.
 - `screenshots/*.png`: ContentDB/GitHub page screenshots captured by the
   project maintainer, licensed under CC-BY-4.0 by the project maintainer.
 
